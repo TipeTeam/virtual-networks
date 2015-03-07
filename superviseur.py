@@ -3,11 +3,13 @@
 import os, time, sys
 from msvcrt import getch
 
+def url(num): return "taches\ordi"+str(num)+".txt"
+
 def main():
 	def copain():
 		global nombre
 		try: # déterminer si un nouveau copain est arrivé
-			fichier = open(str(nombre) + ".txt", "r")
+			fichier = open(url(nombre), "r")
 			print("l'Ordi " + str(nombre) + " a rejoint le réseau !")
 			ajout(nombre)
 			nombre+=1
@@ -77,7 +79,7 @@ def changement(): #une liaison apparait ou disparait
 cmp=1
 while 1:
 	try:
-		os.remove(str(cmp)+".txt")
+		os.remove(url(cmp)+".txt")
 	except IOError:
 		table=[]
 		fichier=open("table.txt","w")
