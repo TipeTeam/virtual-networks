@@ -2,6 +2,7 @@
 
 import os, time, sys
 from msvcrt import getch
+from floyd import floyd, inf # on importe l'algorithme de Floyd pour trouver les +courts chemins
 
 def url(num): return "taches\ordi"+str(num)+".txt"
 
