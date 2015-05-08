@@ -16,13 +16,13 @@ def floyd(g):
       distance = g[i][j]
       w[i].append({
         "distance": distance,  # distance : inf si pas de liaison, +petit c'est meilleur, 0 si osef
-        "direction": j # voisin par lequel passer. Au dÃ©but, on suppose qu'on peut aller direct de i Ã  j 
+        "direction": j # voisin par lequel passer. Au début, on suppose qu'on peut aller direct de i à j 
       })
 
-  for k in range (n): # points atteints en k Ã©tapes ou moins (k = n au max car on passe pas 2fois au mÃªme endroit)
-    for i in range (n): # traitement de chaque ordi comme point de dÃ©part
+  for k in range (n): # points atteints en k étapes ou moins (k = n au max car on passe pas 2fois au même endroit)
+    for i in range (n): # traitement de chaque ordi comme point de départ
       for j in range (n): # test de toutes les destinations
-        if i != j: # on va pas chercher la merde en demandant si c'est rapide d'aller de Paris Ã  Paris...
+        if i != j: # on va pas chercher la merde en demandant si c'est rapide d'aller de Paris à Paris...
           distance_testee = w[i][k]["distance"] + w[k][j]["distance"]
           if (distance_testee < w[i][j]["distance"]):
             w[i][j] = {
@@ -31,20 +31,20 @@ def floyd(g):
             }
   for i in range (n):
     for j in range (i+1,n):
-      print("Trajet de "+str(i)+" Ã  "+str(j)+" : "+str(w[i][j]["distance"])+"km.\nDirigez-vous vers "+str(w[i][j]["direction"])+".\n\n")
+      print("Trajet de "+str(i)+" à "+str(j)+" : "+str(w[i][j]["distance"])+"km.\nDirigez-vous vers "+str(w[i][j]["direction"])+".\n\n")
   return w
 
-floyd(
+"""floyd(
 [
   [ 0 , 1 ,inf,inf],
   [ 1 , 0 , 9 , 1 ],
   [inf, 9 , 0 , 5 ],
   [inf, 1 , 5 , 0 ]
 ]
-)
+)"""
 
 """
-Le graphe testÃ© ci-dessus est :
+Le graphe testé ci-dessus est :
 
   [1] ---1km--- [2] ---9km--- [3] ---5km--- [0]
                  |                           |

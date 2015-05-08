@@ -3,7 +3,7 @@
 
 """user"""
 
-import os, time, sys , select
+import os, time, sys , select, random
 from msvcrt import getch
 
 # routeurprécédent<>adressefinale<>expéditeur<>message
@@ -11,8 +11,24 @@ from msvcrt import getch
 
 """il faudra traiter le cas où l'ordinateur destination n'est pas (du tout) accessible"""
 
+def rand(a,b):
+  return random.randint(a,b)
 
-def url(num): return "taches/joueur"+ str(num)+".txt"
+def url(num): return "automatic/joueur"+ str(num)+".txt"
+
+def lire_table():
+  fichier = open("automatic/_table.txt",'r')
+  table = fichier.read()
+  fichier.close()
+  return table
+
+fichier=open("automatic/_infos.txt",'r')
+nombre = fichier.readline()
+taux_connexion = fichier.readline()
+tps_traitement = fichier.readline()
+frequence_envoi = fichier.readline()
+fichier.close()
+
 class Ordi :
   def __init__(self, num):
     self.num = num
@@ -20,6 +36,7 @@ class Ordi :
     #os.remove(self.url) # on vire l'ancien fichier
     self.fichier = open(self.url, "w")
     self.fichier.close()
+    self.table = (lire_table())[num] 
   
   def envoi(self, param): # le facteur sera forcément un voisin de self
     phrase = str(self.num) +"<>"+ param[1] +"<>"+ param[2] +"<>"+ param[3]
@@ -29,12 +46,10 @@ class Ordi :
     f.close()
     return True
   
-  def route(self, dest): #bricole moche pour commencer : le mec est un voisin direct !
-    fichier=open("table.txt",'r')
-    table=fichier.read()
-    fichier.close()
-    if str(table[self.num-1][dest-1])==1:
-      return(dest)
+  def route(self, dest): #renvoie la prochaine étape pour aller à Dest
+    t = lire_table()
+    self.table = (eval(t))[self.num]
+    return self.table[dest]["direction"]
   
   def traitement(self):
     f=open(self.url, "r")
@@ -59,8 +74,9 @@ class Ordi :
       self.envoi(param)
 
 def ecrire():
-    phrase = input("phrase ? ")
-    dest = int(input("destinataire ?"))
+    phrase = str(time())
+    dest = rand(0,nombre-2)
+    dest += (dest >= ordi.num)
     ordi.envoi([str(ordi.num), str(dest), str(ordi.num), phrase])
     main()
   
@@ -68,20 +84,8 @@ def main():
   global QUITTER, chargement
   chargement[0] = chargement[0]%(len(chargement)-1) + 1
   print(chargement[chargement[0]], end="\r")
-  ordi.traitement()  
-  def copain():
-    #print("copain")
-    global nombre
-    try: # déterminer si un nouveau copain est arrivé
-      fichier = open(url(nombre), "r")
-      print("l'Ordi " + str(nombre) + " a rejoint le réseau !")    
-      nombre+=1
-      main()
-    except IOError:
-      return(True)  
-  copain()    
+  ordi.traitement()   
   try:
-    #print("try")
     if(QUITTER):
       os.remove(url(num))
       sys.exit(0)
@@ -100,23 +104,22 @@ def main():
       ecrire()
 
 QUITTER = False
-chargement = [0,"     (O)c===8 ","     (O) c===8","     (O)c===8 ","     (Cc===8  "," A   (C===8   "," Ah  (C==8    "," Ah! (C===8   "," Ah! (Cc===8  "]
-cmp=1
-os.system("cls")
+chargement = [0,"  ...   ","  ....  ","  ..... ","  ......","  ..... ","  ....  ","  ...   ","  ..    "]
+tmp=0
+#os.system("cls")
 while 1: #insertion dans le réseau + lancement
   try:
-    fichier = open(url(cmp), "r")
+    fichier = open(url(tmp), "r")
   except IOError: #le fichier n'existe pas
-    nombre = cmp
-    num=cmp
+    nombre = tmp
+    num=tmp
     fichier=open(url(num),'w') #on le crée
     fichier.close()
-    os.system("title User" + str(num))
-    print("vous êtes l'Ordi " + str(num))
-    ordi=Ordi(num)
-    print("Faites Ctrl+C pour quitter ou écrire",'\n')
-    main() # les choses sérieuses commencent, on quitte la place.
-  cmp+=1
+    os.system("title Auto" + str(num))
+    print("Vous êtes l'Ordi automatique " + str(num))
+    ordi = Ordi(num)
+    main()
+  tmp+=1
 
   
 """fin user"""

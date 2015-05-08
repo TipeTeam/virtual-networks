@@ -5,7 +5,7 @@
 
 import os, time, sys
 from msvcrt import getch
-from floyd import floyd, inf # on importe l'algorithme de Floyd pour trouver les +courts chemins
+from algo_floyd import floyd, inf # on importe l'algorithme de Floyd pour trouver les +courts chemins
 
 def url(num): return "taches/joueur"+str(num)+".txt"
 
@@ -14,9 +14,9 @@ def url(num): return "taches/joueur"+str(num)+".txt"
 def main():
   def copain():
     global nombre
-    try: # dÃ©terminer si un nouveau copain est arrivÃ©
+    try: # déterminer si un nouveau copain est arrivé
       fichier = open(url(nombre), "r")
-      print("l'Ordi " + str(nombre) + " a rejoint le rÃ©seau !")
+      print("l'Ordi " + str(nombre) + " a rejoint le réseau !")
       ajout(nombre)
       nombre+=1
       main()
@@ -27,7 +27,7 @@ def main():
     time.sleep(1)
     main()
   except KeyboardInterrupt:
-    print("Echap pour quitter, Espace pour revenir en arriÃ¨re, t pour consulter la table, c pour effectuer un changement")
+    print("Echap pour quitter, Espace pour revenir en arrière, t pour consulter la table, c pour effectuer un changement")
     z=getch()
     if ord(z)==27: #Echap
       os.remove("table.txt")
@@ -39,7 +39,7 @@ def main():
     else:
       changement()
 
-def ajout(nombre): # l'ordi Nombre dÃ©barque sur le rÃ©seau ; renseignement de ses liaisons
+def ajout(nombre): # l'ordi Nombre débarque sur le réseau ; renseignement de ses liaisons
   for i in range(1,nombre):
     a=int(input("liaison de Ordi " + str(nombre) + ' vers Ordi ' + str(i) + '?'))
     assert a==0 or a==1
@@ -52,7 +52,7 @@ def ajout(nombre): # l'ordi Nombre dÃ©barque sur le rÃ©seau ; renseignement de s
   liste.append(1)
   table.append(liste)
 
-  os.remove("table.txt") #mÃ©thode ptÃªt un peu radicale...
+  os.remove("table.txt") #méthode ptêt un peu radicale...
   fichier=open("table.txt","w")
   fichier.write(str(table))
   fichier.close()
@@ -64,15 +64,15 @@ def changement(): #une liaison apparait ou disparait
   assert (base < nombre) and (dest < nombre)
   a=table[base-1][dest-1]
   print(table)
-  print("l'Ã©tat actuel de la liaison de "+str(base)+" vers "+str(dest)+" est "+str(a))
+  print("l'état actuel de la liaison de "+str(base)+" vers "+str(dest)+" est "+str(a))
   print("Voulez-vous changer cette liaison ? Enter <-> oui ; autre <-> non")
   if ord(getch())==13: #Enter
     print('avant ' + str(a))
     print((a+1)%2)
     table[base-1][dest-1]=(a+1)%2
-    print('aprÃ¨s ' + str(table[base-1][dest-1]))
+    print('après ' + str(table[base-1][dest-1]))
     print(table)
-    os.remove("table.txt") #mÃ©thode ptÃªt un peu radicale...
+    os.remove("table.txt") #méthode ptêt un peu radicale...
     fichier=open("table.txt","w")
     fichier.write(str(table))
     fichier.close()
@@ -91,7 +91,7 @@ while 1:
     fichier=open("table.txt","w")
     fichier.write(str(table))
     fichier.close()
-    nombre=1 #nÃ©cessitÃ© d'ouvrir en premier superviseur
+    nombre=1 #nécessité d'ouvrir en premier superviseur
     main()
   cmp+=1
   
