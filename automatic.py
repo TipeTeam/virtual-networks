@@ -2,8 +2,7 @@
 # coding: iso-8859-1
 
 """user"""
-
-import os, time, sys , select, random
+import os, time, sys , select, random, string, webbrowser
 from msvcrt import getch
 from pprint import pprint
 from algo_floyd import floyd, inf # on importe l'algorithme de Floyd pour trouver les +courts chemins
@@ -44,6 +43,11 @@ def actualiser_table():
   fichier = open("automatic/_table.txt","w")
   fichier.write(str(tableF))
   fichier.close()
+  fichier = open("automatic/_adj.txt","w")
+  phrase = str(adjacence).replace("inf", '-1').replace(" ", '')
+  fichier.write(phrase)
+  fichier.close()
+  webbrowser.open('http://rannios.free.fr/?/tipe/'+ phrase)
 
 def allumer_ordi():
   os.system("start automatic_user.py")
@@ -78,7 +82,6 @@ def creer_reseau(nombre, taux_connexion):
   
   for i in range (nombre):
     allumer_ordi()
-  
 
 
 adjacence = []
@@ -87,7 +90,10 @@ tableF = []
 
 os.system("cls")
 
-creer_reseau(3, 10)
-
-  
+if not(int(sys.argv[1])>0): nombre = 6
+else: nombre = int(sys.argv[1])
+if not(int(sys.argv[2])>0): taux = 30
+else: taux = int(sys.argv[2])
+creer_reseau(nombre, taux)
+ 
 """fin user"""

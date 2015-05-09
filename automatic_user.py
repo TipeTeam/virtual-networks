@@ -23,10 +23,12 @@ def lire_table():
   return table
 
 fichier=open("automatic/_infos.txt",'r')
-nombre = fichier.readline()
-taux_connexion = fichier.readline()
-tps_traitement = fichier.readline()
-frequence_envoi = fichier.readline()
+nombre = int(fichier.readline())
+taux_connexion = int(fichier.readline())
+tps_traitement = float(fichier.readline())
+frequence_envoi = int(fichier.readline())
+delai = 1
+print(nombre, taux_connexion, tps_traitement, frequence_envoi)
 fichier.close()
 
 class Ordi :
@@ -47,7 +49,7 @@ class Ordi :
     return True
   
   def route(self, dest): #renvoie la prochaine étape pour aller à Dest
-    t = lire_table()
+    t = lire_table() 
     self.table = (eval(t))[self.num]
     return self.table[dest]["direction"]
   
@@ -60,23 +62,27 @@ class Ordi :
     f.write(contenu)
     f.close()
     
-    if tache != "":
-      print (tache)
-      print(self.table)
+    if tache != "" and tache != "\n":
+      #print (tache)
+      #print(self.table)
       param = tache.split("<>") # /!\ là c'est param[0...] et pas param['dest'...]
+      param[3] = ((param[3]).split("\n"))[0] # on vire le saut de ligne final
       # for i in range (2): param[i] = int(param[i])
       if(int(param[1]) == self.num):
-        print("L'ordi "+param[2]+" vous envoie : \""+ param[3] +"\".")
+        retard = time.time() - float(param[3])
+        print("Réception de "+param[2]+", retard : "+ str(retard) +" secondes")
         return ""
       # else:
       param[0] = self.num
-      print("Vous transmettez un message de "+param[2]+" vers "+param[1]+".\n")
+      print("Transmission "+ param[2] +"->"+ param[1] +", délai : "+ str(delai))
+      time.sleep(delai) # délai de transmission
       self.envoi(param)
 
 def ecrire():
-    phrase = str(time())
+    phrase = str(time.time())
     dest = rand(0,nombre-2)
     dest += (dest >= ordi.num)
+    print("   Envoi à   "+ str(dest) +"  :  "+ str(phrase))
     ordi.envoi([str(ordi.num), str(dest), str(ordi.num), phrase])
     main()
   
@@ -87,16 +93,18 @@ def main():
   ordi.traitement()   
   try:
     if(QUITTER):
-      os.remove(url(num))
+      os.remove(url(ordi.num))
       sys.exit(0)
-    time.sleep(1)
+    time.sleep(2)
+    if(rand(0, frequence_envoi)):
+      ecrire()
     main()
   except KeyboardInterrupt:
     print("Echap pour quitter, Espace pour revenir en arrière, ailleurs pour écrire")
     z=getch()
     if ord(z)==27: #Echap   # Y avait plein de bugs donc j'ai dû faire des trucs louches
       QUITTER = True
-      os.remove(url(num))
+      os.remove(url(ordi.num))
       sys.exit(0)
     elif ord(z)==32: #Espace
       main()
@@ -106,20 +114,22 @@ def main():
 QUITTER = False
 chargement = [0,"  ...   ","  ....  ","  ..... ","  ......","  ..... ","  ....  ","  ...   ","  ..    "]
 tmp=0
-#os.system("cls")
+os.system("cls")
 while 1: #insertion dans le réseau + lancement
   try:
     fichier = open(url(tmp), "r")
-  except IOError: #le fichier n'existe pas
-    nombre = tmp
-    num=tmp
-    fichier=open(url(num),'w') #on le crée
     fichier.close()
-    os.system("title Auto" + str(num))
-    print("Vous êtes l'Ordi automatique " + str(num))
-    ordi = Ordi(num)
-    main()
+  except IOError: #le fichier n'existe pas
+    if(tmp >= nombre): print("Vous êtes trop nombreux sur ce réseau."); break
+    else:
+      fichier=open(url(tmp),'w') #on le crée
+      fichier.close()
+      os.system("title Auto" + str(tmp))
+      print("Vous êtes l'Ordi automatique " + str(tmp))
+      ordi = Ordi(tmp)
+      main()
   tmp+=1
+
 
   
 """fin user"""
