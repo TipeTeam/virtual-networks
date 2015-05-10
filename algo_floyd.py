@@ -29,9 +29,9 @@ def floyd(g):
               "distance": distance_testee,
               "direction": w[i][k]["direction"]
             }
-  for i in range (n):
+  """for i in range (n):
     for j in range (i+1,n):
-      print("Trajet de "+str(i)+" à "+str(j)+" : "+str(w[i][j]["distance"])+"km.\nDirigez-vous vers "+str(w[i][j]["direction"])+".\n\n")
+      print("Trajet de "+str(i)+" à "+str(j)+" : "+str(w[i][j]["distance"])+"km.\nDirigez-vous vers "+str(w[i][j]["direction"])+".\n\n")"""
   return w
 
 """floyd(

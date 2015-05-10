@@ -1,20 +1,17 @@
 #!/usr/bin/python3
 # coding: iso-8859-1
 
-"""user"""
-import os, time, sys , select, random, string, webbrowser
-from msvcrt import getch
+import os, time, sys, urllib.request, select, string, webbrowser, param
+from randint import rand
 from pprint import pprint
+from msvcrt import getch
 from algo_floyd import floyd, inf # on importe l'algorithme de Floyd pour trouver les +courts chemins
 
 # routeurprécédent<>adressefinale<>expéditeur<>message
 #      0                   1           2          3
 
 """il faudra traiter le cas où l'ordinateur destination n'est pas (du tout) accessible"""
-
-def rand(a,b):
-  return random.randint(a,b)
-
+_p = param.Param("automatic")
 def url(num): return "automatic/joueur"+ str(num)+".txt"
   
 def creer_tableau(lignes, colonnes, value):
@@ -25,7 +22,7 @@ def creer_tableau(lignes, colonnes, value):
 
 def connecter(o1, o2, distance):
   global adjacence
-  print(o1,o2,distance)
+  #print(o1,o2,distance)
   adjacence[o1][o2] = distance
   adjacence[o2][o1] = distance
 
@@ -40,23 +37,23 @@ def rompre(o1, o2):
 def actualiser_table():
   global adjacence, tableF
   tableF = floyd(adjacence)
-  fichier = open("automatic/_table.txt","w")
-  fichier.write(str(tableF))
-  fichier.close()
-  fichier = open("automatic/_adj.txt","w")
-  phrase = str(adjacence).replace("inf", '-1').replace(" ", '')
-  fichier.write(phrase)
-  fichier.close()
+  _p.set(table = tableF)
+  phrase = ""
+  for i in range(1,len(adjacence)):
+    phrase += "_"
+    for j in range(0,i):
+      if adjacence[i][j] == 0 or adjacence[i][j] == inf:
+        phrase += "0"
+      else: phrase += "1"
+  _p.set(adj = phrase)  #phrase = str(tmpt).replace("inf", '0').replace(" ", '').replace(",", '').replace("][", '_').replace("]", '').replace("[", '')
   webbrowser.open('http://rannios.free.fr/?/tipe/'+ phrase)
 
 def allumer_ordi():
   os.system("start automatic_user.py")
+  pass
 
 def creer_reseau(nombre, taux_connexion):
-  fichier = open("automatic/_infos.txt","w")
-  fichier.write(str(nombre) + "\n"+ str(taux_connexion) + "\n"+ str(0.1) + "\n"+ str(5))
-  fichier.close()
-  
+  _p.set(nombre = nombre, connectivite = taux_connexion, tpsTraitement = 1, frequenceEnvoi = 5)
   for i in range(nombre):
     if(os.path.isfile(url(i))):
       os.remove(url(i))
@@ -64,21 +61,20 @@ def creer_reseau(nombre, taux_connexion):
   global adjacence
   adjacence = creer_tableau(nombre, nombre, inf)
   connecter(0, 0, 0)
-  #chemins = [[0]*nombre]*nombre
   
   # créer les liaisons afin d'avoir un graphe connexe :
   for o1 in range (1,nombre): # le zéro se connecte à personne, c'est les autres qui s'y connectent
     connecter(o1, o1, 0)
-    k = rand(1,max(o1-1, 1+round(o1 * taux_connexion / 100))) # c'est le nombre de voisins inférieurs auxquels o1 sera connecté
+    k = min(2*o1-1, rand(1,max(1, round(o1 * taux_connexion / 100)))) # c'est le nombre de voisins inférieurs auxquels o1 sera connecté
     while k > 0:
       k -= 1
-      o2 = rand(0,o1-1)
+      o2 = rand(0,o1-1) # on le connecte avec qqn au pif, tant pis si ils étaient déjà potes
       if(not sont_connectes(o1, o2)):
         distance = 1 # ou rand(1,nombre) si l'on veut des distances variées
         connecter(o1, o2, distance)
   actualiser_table()
   pprint(adjacence)
-  #pprint(tableF)
+  print(taux_connexion)
   
   for i in range (nombre):
     allumer_ordi()
@@ -86,14 +82,18 @@ def creer_reseau(nombre, taux_connexion):
 
 adjacence = []
 tableF = []
-#liaisons = [] pourra servir à autoriser plusieurs lisaisons directes entre 2 mêmes ordis
 
 os.system("cls")
 
+args = []
 if not(int(sys.argv[1])>0): nombre = 6
 else: nombre = int(sys.argv[1])
 if not(int(sys.argv[2])>0): taux = 30
 else: taux = int(sys.argv[2])
 creer_reseau(nombre, taux)
- 
-"""fin user"""
+
+
+input("\n\nAppuyez sur une touche pour clore le réseau.")
+for i in range(nombre):
+  os.remove(url(i))
+os.system("cls")

@@ -1,35 +1,22 @@
 #!/usr/bin/python3
 # coding: iso-8859-1
 
-"""user"""
-
-import os, time, sys , select, random
-from msvcrt import getch
+import os, time, sys , select, param
+from randint import rand
 
 # routeurprécédent<>adressefinale<>expéditeur<>message
 #      0                   1           2          3
-
+os.system("cls")
 """il faudra traiter le cas où l'ordinateur destination n'est pas (du tout) accessible"""
-
-def rand(a,b):
-  return random.randint(a,b)
-
+_p = param.Param("automatic")
 def url(num): return "automatic/joueur"+ str(num)+".txt"
 
 def lire_table():
-  fichier = open("automatic/_table.txt",'r')
-  table = fichier.read()
-  fichier.close()
-  return table
+  return _p.get("table")
 
-fichier=open("automatic/_infos.txt",'r')
-nombre = int(fichier.readline())
-taux_connexion = int(fichier.readline())
-tps_traitement = float(fichier.readline())
-frequence_envoi = int(fichier.readline())
+_p.get("nombre", "connectivite", "tpsTraitement", "frequenceEnvoi", fonction="float")
 delai = 1
-print(nombre, taux_connexion, tps_traitement, frequence_envoi)
-fichier.close()
+print(_p.nombre, _p.connectivite, _p.tpsTraitement, _p.frequenceEnvoi, " coucou")
 
 class Ordi :
   def __init__(self, num):
@@ -43,10 +30,12 @@ class Ordi :
   def envoi(self, param): # le facteur sera forcément un voisin de self
     phrase = str(self.num) +"<>"+ param[1] +"<>"+ param[2] +"<>"+ param[3]
     facteur = self.route(int(param[1]))  # on cherche par qui il faut passer
-    f=open(url(facteur),"a")
-    f.write(phrase + "\n")
-    f.close()
-    return True
+    if os.path.exists(url(facteur)):
+      f=open(url(facteur),"a")
+      f.write(phrase + "\n")
+      f.close()
+      return True
+    return False
   
   def route(self, dest): #renvoie la prochaine étape pour aller à Dest
     t = lire_table() 
@@ -80,47 +69,30 @@ class Ordi :
 
 def ecrire():
     phrase = str(time.time())
-    dest = rand(0,nombre-2)
+    dest = rand(0,_p.nombre-2)
     dest += (dest >= ordi.num)
     print("   Envoi à   "+ str(dest) +"  :  "+ str(phrase))
     ordi.envoi([str(ordi.num), str(dest), str(ordi.num), phrase])
-    main()
   
 def main():
-  global QUITTER, chargement
-  chargement[0] = chargement[0]%(len(chargement)-1) + 1
-  print(chargement[chargement[0]], end="\r")
-  ordi.traitement()   
   try:
-    if(QUITTER):
-      os.remove(url(ordi.num))
-      sys.exit(0)
-    time.sleep(2)
-    if(rand(0, frequence_envoi)):
-      ecrire()
-    main()
+    while 1:
+      ordi.traitement()   
+      time.sleep(0.2)
+      if(rand(0, _p.frequenceEnvoi)):
+        ecrire()
   except KeyboardInterrupt:
-    print("Echap pour quitter, Espace pour revenir en arrière, ailleurs pour écrire")
-    z=getch()
-    if ord(z)==27: #Echap   # Y avait plein de bugs donc j'ai dû faire des trucs louches
-      QUITTER = True
-      os.remove(url(ordi.num))
-      sys.exit(0)
-    elif ord(z)==32: #Espace
-      main()
-    else:
-      ecrire()
+    os.remove(url(ordi.num))
+    sys.exit(0)
 
-QUITTER = False
-chargement = [0,"  ...   ","  ....  ","  ..... ","  ......","  ..... ","  ....  ","  ...   ","  ..    "]
 tmp=0
-os.system("cls")
+
 while 1: #insertion dans le réseau + lancement
   try:
     fichier = open(url(tmp), "r")
     fichier.close()
   except IOError: #le fichier n'existe pas
-    if(tmp >= nombre): print("Vous êtes trop nombreux sur ce réseau."); break
+    if(tmp >= _p.nombre): print("Vous êtes trop nombreux sur ce réseau."); break
     else:
       fichier=open(url(tmp),'w') #on le crée
       fichier.close()
@@ -129,7 +101,3 @@ while 1: #insertion dans le réseau + lancement
       ordi = Ordi(tmp)
       main()
   tmp+=1
-
-
-  
-"""fin user"""
