@@ -15,8 +15,8 @@ def lire_table():
   return _p.get("table")
 
 _p.get("nombre", "connectivite", "tpsTraitement", "frequenceEnvoi", fonction="float")
-delai = 1
-print(_p.nombre, _p.connectivite, _p.tpsTraitement, _p.frequenceEnvoi, " coucou")
+print(_p.nombre, _p.connectivite, _p.tpsTraitement, _p.frequenceEnvoi)
+vitesse = 20 #actualisations par seconde
 
 class Ordi :
   def __init__(self, num):
@@ -25,7 +25,18 @@ class Ordi :
     #os.remove(self.url) # on vire l'ancien fichier
     self.fichier = open(self.url, "w")
     self.fichier.close()
-    self.table = (lire_table())[num] 
+    self.table = (lire_table())[num]
+    if(self.num == 0):
+      os.remove(url("0stat")) 
+  
+  def add_stat(self, *colonnes):
+    if(self.num == 0):
+      phrase = ""
+      for val in colonnes:
+        phrase += str(val).replace(".", ",") + "\t"
+      f=open(url("0stat"),"a")
+      f.write(phrase + "\n")
+      f.close()
   
   def envoi(self, param): # le facteur sera forcément un voisin de self
     phrase = str(self.num) +"<>"+ param[1] +"<>"+ param[2] +"<>"+ param[3]
@@ -52,19 +63,17 @@ class Ordi :
     f.close()
     
     if tache != "" and tache != "\n":
-      #print (tache)
-      #print(self.table)
       param = tache.split("<>") # /!\ là c'est param[0...] et pas param['dest'...]
       param[3] = ((param[3]).split("\n"))[0] # on vire le saut de ligne final
-      # for i in range (2): param[i] = int(param[i])
       if(int(param[1]) == self.num):
         retard = time.time() - float(param[3])
         print("Réception de "+param[2]+", retard : "+ str(retard) +" secondes")
+        self.add_stat(time.time(), param[2], retard)
         return ""
       # else:
       param[0] = self.num
-      print("Transmission "+ param[2] +"->"+ param[1] +", délai : "+ str(delai))
-      time.sleep(delai) # délai de transmission
+      print("Transmission "+ param[2] +"->"+ param[1] +", délai : "+ str(_p.tpsTraitement))
+      time.sleep(_p.tpsTraitement) # délai de transmission
       self.envoi(param)
 
 def ecrire():
@@ -74,12 +83,12 @@ def ecrire():
     print("   Envoi à   "+ str(dest) +"  :  "+ str(phrase))
     ordi.envoi([str(ordi.num), str(dest), str(ordi.num), phrase])
   
-def main():
+def main():  
   try:
     while 1:
       ordi.traitement()   
-      time.sleep(0.2)
-      if(rand(0, _p.frequenceEnvoi)):
+      time.sleep(1/vitesse)
+      if(not rand(0, _p.frequenceEnvoi*vitesse)):
         ecrire()
   except KeyboardInterrupt:
     os.remove(url(ordi.num))

@@ -20,7 +20,7 @@ def creer_tableau(lignes, colonnes, value):
     t.append([value]*colonnes)
   return t
 
-def connecter(o1, o2, distance):
+def connecter(o1, o2, distance=1):
   global adjacence
   #print(o1,o2,distance)
   adjacence[o1][o2] = distance
@@ -32,10 +32,12 @@ def rompre(o1, o2):
   global adjacence
   r = sont_connectes(o1, o2)
   adjacence[o1][o2] = inf
+  adjacence[o2][o1] = inf
   return r
 
 def actualiser_table():
   global adjacence, tableF
+  print(adjacence)
   tableF = floyd(adjacence)
   _p.set(table = tableF)
   phrase = ""
@@ -53,7 +55,7 @@ def allumer_ordi():
   pass
 
 def creer_reseau(nombre, taux_connexion):
-  _p.set(nombre = nombre, connectivite = taux_connexion, tpsTraitement = 1, frequenceEnvoi = 5)
+  _p.set(nombre = nombre, connectivite = taux_connexion, tpsTraitement = 0.25, frequenceEnvoi = 1)
   for i in range(nombre):
     if(os.path.isfile(url(i))):
       os.remove(url(i))
@@ -79,7 +81,6 @@ def creer_reseau(nombre, taux_connexion):
   for i in range (nombre):
     allumer_ordi()
 
-
 adjacence = []
 tableF = []
 
@@ -92,8 +93,26 @@ if not(int(sys.argv[2])>0): taux = 30
 else: taux = int(sys.argv[2])
 creer_reseau(nombre, taux)
 
-
-input("\n\nAppuyez sur une touche pour clore le réseau.")
-for i in range(nombre):
-  os.remove(url(i))
-os.system("cls")
+while 1:
+  print("\n\nEchap: quitter\nEspace: revenir en arrière\n+: ajouter liaison\n-: supprimer liaison") #\n0: éteindre un ordi")
+  z=ord(getch())
+  if z==27: #Echap
+    for i in range(nombre):
+      os.remove(url(i))
+    os.system("cls")
+    sys.exit(0)
+  elif z==32: #Espace  
+    pass
+  elif z==43: #+
+    connecter(int(input("Premier ordi")), int(input("Second ordi")))
+    actualiser_table()
+  elif z==45: #-
+    print("Attention ! Le réseau doit rester connexe !")
+    rompre(int(input("Premier ordi")), int(input("Second ordi")))
+    actualiser_table()
+  elif z==48: #0
+    print("Attention ! Le réseau doit rester connexe !")
+    rompre(int(input("Premier ordi")), int(input("Second ordi")))
+    actualiser_table()
+  else:
+    pass
