@@ -7,7 +7,7 @@
 import os
 inf = float("inf")
 
-def floyd(g, multi = False):
+def floyd(g):
   n = len(g)
   w = []
   for i in range (n):
@@ -16,27 +16,23 @@ def floyd(g, multi = False):
       distance = g[i][j]
       w[i].append({
         "distance": distance,  # distance : inf si pas de liaison, +petit c'est meilleur, 0 si osef
-        "direction": ([j] if multi else j) # voisin par lequel passer. Au début, on suppose qu'on peut aller direct de i à j 
+        "direction": j # voisin par lequel passer. Au début, on suppose qu'on peut aller direct de i à j 
       })
 
-  for k in range (n): # points atteints en passant par les sommets intermédiaires d'indice <= k
+  for k in range (n): # points atteints en k étapes ou moins (k = n au max car on passe pas 2fois au même endroit)
     for i in range (n): # traitement de chaque ordi comme point de départ
       for j in range (n): # test de toutes les destinations
-        if i != j and i != k: # on va pas chercher la merde en demandant si c'est rapide d'aller de Paris à Paris...
+        if i != j: # on va pas chercher la merde en demandant si c'est rapide d'aller de Paris à Paris...
           distance_testee = w[i][k]["distance"] + w[k][j]["distance"]
           if (distance_testee < w[i][j]["distance"]):
             w[i][j] = {
               "distance": distance_testee,
               "direction": w[i][k]["direction"]
             }
-          elif (multi and distance_testee == w[i][j]["distance"]):
-            w[i][j]["direction"] = list(set(w[i][j]["direction"] + w[i][k]["direction"])) # ce sont des listes
-          #print(k, " ", i, " ", j, " ", w[i][j]["direction"])
   """for i in range (n):
     for j in range (i+1,n):
       print("Trajet de "+str(i)+" à "+str(j)+" : "+str(w[i][j]["distance"])+"km.\nDirigez-vous vers "+str(w[i][j]["direction"])+".\n\n")"""
   return w
-
 
 """floyd(
 [

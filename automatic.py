@@ -38,7 +38,7 @@ def rompre(o1, o2):
 def actualiser_table():
   global adjacence, tableF
   print(adjacence)
-  tableF = floyd(adjacence, multi = True)
+  tableF = floyd(adjacence)
   _p.set(table = tableF)
   phrase = ""
   for i in range(1,len(adjacence)):
@@ -55,7 +55,7 @@ def allumer_ordi():
   pass
 
 def creer_reseau(nombre, taux_connexion):
-  _p.set(nombre = nombre, connectivite = taux_connexion, tpsTraitement = 0.25, frequenceEnvoi = 0.5)
+  _p.set(nombre = nombre, connectivite = taux_connexion, tpsTraitement = 0.25, frequenceEnvoi = 1)
   for i in range(nombre):
     if(os.path.isfile(url(i))):
       os.remove(url(i))
