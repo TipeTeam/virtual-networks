@@ -12,7 +12,7 @@ _p = param.Param("automatic")
 def url(num): return "automatic/joueur"+ str(num)+".txt"
 
 def lire_table():
-  return _p.get("table")
+  return eval(_p.get("table"))
 
 _p.get("nombre", "connectivite", "tpsTraitement", "frequenceEnvoi", fonction="float")
 print(_p.nombre, _p.connectivite, _p.tpsTraitement, _p.frequenceEnvoi)
@@ -26,7 +26,7 @@ class Ordi :
     self.fichier = open(self.url, "w")
     self.fichier.close()
     self.table = (lire_table())[num]
-    if(self.num == 0):
+    if(self.num == 0 and os.path.exists(url("0stat"))):
       os.remove(url("0stat")) 
   
   def add_stat(self, *colonnes):
@@ -48,10 +48,15 @@ class Ordi :
       return True
     return False
   
-  def route(self, dest): #renvoie la prochaine étape pour aller à Dest
-    t = lire_table() 
-    self.table = (eval(t))[self.num]
-    return self.table[dest]["direction"]
+  def route(self, dest): #renvoie la prochaine étape pour aller à Dest  
+    self.table = (lire_table())[self.num]
+    r = self.table[dest]["direction"]
+    if(type(r) is list):
+      if(int(_p.get("multi"))):
+        return r[rand(0, len(r)-1)]
+      else: return r[0]
+    else:
+      return r
   
   def traitement(self):
     f=open(self.url, "r")
