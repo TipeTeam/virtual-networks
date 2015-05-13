@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+# coding: iso-8859-1
+
 """ceci est un programme contenant des fonctions générant des graphes et des fonctions les affichant (tableau et schéma de liaisons) via turtle"""
 
 import turtle as tt
