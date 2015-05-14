@@ -55,7 +55,7 @@ def allumer_ordi():
   pass
 
 def creer_reseau(nombre, taux_connexion):
-  _p.set(nombre = nombre, connectivite = taux_connexion, tpsTraitement = 0.25, frequenceEnvoi = 0.5)
+  _p.set(nombre = nombre, connectivite = taux_connexion, tpsTraitement = 0.1, frequenceEnvoi = 0.3)
   for i in range(nombre):
     if(os.path.isfile(url(i))):
       os.remove(url(i))

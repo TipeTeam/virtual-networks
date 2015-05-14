@@ -16,7 +16,8 @@ def lire_table():
 
 _p.get("nombre", "connectivite", "tpsTraitement", "frequenceEnvoi", fonction="float")
 print(_p.nombre, _p.connectivite, _p.tpsTraitement, _p.frequenceEnvoi)
-vitesse = 20 #actualisations par seconde
+vitesse = 40 #actualisations par seconde
+
 
 class Ordi :
   def __init__(self, num):
@@ -38,6 +39,7 @@ class Ordi :
       f.write(phrase + "\n")
       f.close()
   
+
   def envoi(self, param): # le facteur sera forcément un voisin de self
     phrase = str(self.num) +"<>"+ param[1] +"<>"+ param[2] +"<>"+ param[3]
     facteur = self.route(int(param[1]))  # on cherche par qui il faut passer
@@ -73,7 +75,7 @@ class Ordi :
       if(int(param[1]) == self.num):
         retard = time.time() - float(param[3])
         print("Réception de "+param[2]+", retard : "+ str(retard) +" secondes")
-        self.add_stat(time.time(), param[2], retard)
+        self.add_stat(param[3], param[2], retard)
         return ""
       # else:
       param[0] = self.num
