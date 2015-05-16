@@ -1,0 +1,170 @@
+"""communication et mise à jour entre routeurs"""
+
+import os, time, sys , select
+from msvcrt import getch
+
+""" /!\ protocole changé !"""
+# adressefinale<>expéditeur<>message
+# hello<>expéditeur<>date
+# rehello<>destinataire(self)<>laps de temps mis entre émission et réception
+# hey<>liaisons<>expéditeur<>ordisayantreçuscemessage
+
+# graphe : matrice n*n contenant pour chaque case le temps de la liaison
+# liaisons : tableau n*2 contenant le temps de la liaison (éventuellement inf) entre l'ordi et les autres et la date d'actu.
+
+#on n'envisage la suppression d'un ordi ou son ajout, mais seulement la destruction/construction de liaisons
+global liaisons
+global graphe
+global liaison_dij
+tps_reactu=30
+tps-_transmi=60
+
+def dijkstra(graphe,centre): #connexe
+	nbre=len(graphe)
+	liste=[]
+	precedent=[centre for i in range(nbre)]
+	for noeud in range(0,nbre):
+		liste.append([graphe[centre][noeud],noeud]) #pas accessible, quand même noeud ?
+	PasEncoreVu=[i for i in range(0,nbre)]
+	PasEncoreVu=enlever(PasEncoreVu,centre)
+	while PasEncoreVu!=[]:
+		[dist,atteint]=[liste[PasEncoreVu[0]][0],PasEncoreVu[0]]
+		for i in PasEncoreVu:
+			if liste[i][0]<dist:
+				[dist,atteint]=[liste[i][0],PasEncoreVu[0]]
+		PasEncoreVu=enlever(PasEncoreVu,atteint)
+		fiston=fils(atteint,graphe) #ensemble des points accessibles depuis atteint
+		for point in fiston:
+			print(liste[point][0],dist,graphe[atteint][point])
+			if liste[point][0]>dist+graphe[atteint][point]:
+				liste[point][0]=dist+graphe[atteint][point]
+				precedent[point]=atteint
+	
+	for k in range(0,nbre): #ce petit bout de code ne fonctionne pas toujours...
+		n1=k
+		while 1:
+			print(n1)
+			if centre==precedent[n1] or centre==n1:
+				liste[k][1]=n1
+				break
+			n1=precedent[n1]
+	return(liste) #on renvoie [[temps,prochain routeur] pour chaque ordi]
+	
+def plusvieux(): #renvoie [plus vieille date, routeur concerné]
+	nbre=len(liaisons)
+	10^10=date
+	for i in range(nbre):
+		if i!=self.num and liaisons[i][0]!=inf and liaison[i][1]<date:
+			date=liaison[i][1]
+			atteint=i
+	return(date,atteint)
+	
+def retour_hello(param):
+	tps=time.time()-param[2]
+	param=["rehello",self.num,tps]
+	self.envoi(param)
+
+def big(lison, ordi, liste):
+	if lison!=graphe[ordi]:
+		envoietout(lison,ordi,liste)
+		for i in range(0,len(graphe)):
+			graphe[ordi][i]=lison[i][0]
+			graphe[i][ordi]=lison[i][0]
+			liaison_dij=dijkstra(graphe,self.num)		
+	else: return ""
+
+def actualiser(param):
+	liaisons[param[1]][0]=param[2]
+	liaisons[param[1][1]=time.time()
+	graphe[self.num][param[1]]=liaison[param[1]][0]
+	graphe[param[1]][self.num]=liaison[param[1]][0]
+
+def url(num): return str(num)+".txt"
+class Ordi :
+  def __init__(self, num):
+    self.num = num
+    self.url = url(num)
+    #os.remove(self.url) # on vire l'ancien fichier
+    self.fichier = open(self.url, "w")
+    self.fichier.close()
+	
+  def envoi(self, param): # le facteur sera forcément un voisin de self
+	phrase = param[0] +"<>"+ param[1] +"<>"+ param[2]
+	facteur = liaison_dij[param[0]][1]  # on trouve par qui il faut passer grâce à Dijkstra
+	f=open(url(facteur),"a")
+	f.write(phrase + "\n")
+	f.close()
+	return(True)
+	
+  def traitement(self):
+    f=open(self.url, "r")
+    tache = f.readline()
+    contenu = f.read()
+    f.close()
+    f=open(self.url, "w")
+    f.write(contenu)
+    f.close()
+    
+    if tache != "" and tache != "\n":
+      param = tache.split("<>") # /!\ là c'est param[0...] et pas param['dest'...]
+      param[2] = ((param[2]).split("\n"))[0] # on vire le saut de ligne final
+	  
+	  if param[0]=="hello" : retour_hello(param)
+	  if param[0]=="rehello" : actualiser(param)
+	  if param[0]=="hey": big(param[1],param[2],param[3])
+	  
+      if(int(param[0]) == self.num):
+        print("L'ordi "+param[1]+" vous envoie : \""+ param[2] +"\".")
+		self.envoi(param[1],self.num,'Nous accusons réception de votre précédent message') #accusé de réception
+        return ""
+      # else:
+	  print("Vous transmettez un message de "+param[1]+" vers "+param[0]+".\n")
+      self.envoi(param)
+
+def envoietout(lison,ordi,liste): #liaisons de l'ordi émetteur initial ; liste des ordis ayant déjà tout	  	
+	voisin=[]
+	for i in range(0,len(liaisons)):
+		if liaisons[i][0]!=0 and liaisons[i][0]!=inf:
+			voisin.append(i)
+	desti=[]
+	for i in voisin:
+		for j in liste:
+			if i==j:
+				break
+		desti.append(i)
+		liste.append(i)
+		
+	for i in desti: #voisins n'ayant pas reçu le message déjà
+		param=[lison,ordi,liste]
+		phrase = "hey" + str(param[0]) +"<>"+ str(param[1]) +"<>"+ str(param[2])
+		facteur = i
+		f=open(url(facteur),"a")
+		f.write(phrase + "\n")
+		f.close()
+
+temps=time.time()
+def main():
+	ordi.traitement()
+	
+	[plusvieilledate,routeur]=plusvieux()
+	if time.time()-plusvieilledate > tps_reactu:
+		self.envoi(["hello",routeur,time.time()])
+	
+	if time.time-temps>tps_reactu: #envoie toute sa table à tous ses voisins
+		envoietout(liaisons,self.num,[])
+		temps=time.time()
+		
+	try:
+		time.sleep(0.25)
+		main()
+		
+	except KeyboardInterrupt:
+		print("Echap pour quitter, Espace pour revenir en arrière, ailleurs pour écrire")
+		z=getch()
+		if ord(z)==27: #Echap
+			os.remove(str(num%nombre)+".txt")
+			sys.exit(0)
+		elif ord(z)==32: #Espace
+			main()
+		else:
+			ecrire()	  
